@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import {exec, ChildProcess, ExecOptions} from 'child_process';
+import * as os from 'os';
 
 export default class PreviewPanel /* implements vscode.Disposable */ {
 	// false if the panel has been closed
@@ -93,7 +94,8 @@ export default class PreviewPanel /* implements vscode.Disposable */ {
 		pandocOptions.push(`--css=${this.cssUri}`);
 		if (baseTagUri)
 			pandocOptions.push('--metadata=header-includes:{{pmp-base-tag}}');
-		this.subprocess = exec(`pandoc ${pandocOptions.join(' ')}`, execOptions, (err, stdout, stderr) => {
+		let pandocExecutable = path.join(os.homedir(), '.cabal/bin/pandoc')
+		this.subprocess = exec(`${pandocExecutable} ${pandocOptions.join(' ')}`, execOptions, (err, stdout, stderr) => {
 			this.subprocess = undefined;
 			if (!this.active) { return; }
 			this.lastRenderedTime = Date.now();
